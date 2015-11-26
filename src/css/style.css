@@ -1,0 +1,40 @@
+table, tr#programMenu {
+	background-color: #454d3e;
+	color: #f78f1e;
+	font: 1em "Arial Black";
+	margin-left: auto;
+	margin-right: auto;
+	padding: 10px;
+	text-align: center; 
+	width: 100%;
+	
+	
+}
+
+th#programTableHeader {
+	margin-left: auto;
+	margin-right: auto;
+	
+}
+
+td.menuBox, a, a:visited{
+	color: #f78f1e;
+	width: 40%;
+	font: 1em "Arial Black";
+	text-decoration: none;
+	
+}
+
+td.menuBox, a:hover{
+	color: #c36e13;
+	font: 1em "Arial Black";
+	text-decoration: none;
+}
+
+colgroup, col, .lightBG{
+	background-color: #E8E8E8
+}
+
+colgroup, col, .darkBG{
+	background-color: #D8D8D8
+}
