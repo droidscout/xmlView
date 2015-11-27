@@ -11,6 +11,17 @@ table, tr#programMenu {
 	
 }
 
+td.tableValues{
+	color: #000000;
+	font: 1em "Arial";
+}
+
+td.totalTableValues{
+	color: #000000;
+	font: 1em "Arial Black";
+	font-weight: bold
+}
+
 th#programTableHeader {
 	margin-left: auto;
 	margin-right: auto;

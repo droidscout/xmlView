@@ -12,17 +12,21 @@ require_once 'functions.php';
 	
 	$eventTypeArr = array(
 		'1' => "Football", 
-		'2' => "Basketball", 
-		'5' => "Tennis", 
-		'7' => "Ice Hockey", 
-		'8' => "Handball", 
+		'2' => "Basketball",
+		'3' => "Ice Hockey",  
+		'4' => "Tennis", 
+		'5' => "Handball",
+		'6' => "Baseball",
+		'7' => "Volleyball",
+		'8' => "Golf",
+		'9' => "Polo",
 		'10' => "Antepost",
-		'0' => "Total" 
+		'11' => "American Football" 
 		);
 		
 	$command = '/home/admin/tradermonitor/jsonprint.py';
 	$result = shell_exec($command);
-	$jsonData = json_decode($result, true);
+	$jsonData = json_decode($result);
 	//var_dump($jsonData);
 ?>
 
@@ -64,22 +68,52 @@ require_once 'functions.php';
 			<th>Blocked events</th>
 			<th>Kompakt events</th>
 			<?php
+				$totalActiveEvents = 0;
+				$totalInactiveEvents = 0;
+				$totalBlockedEvents = 0;
+				$totalKomapktEvents = 0;
+				
 				foreach( $eventTypeArr as $sport ) {
-					//create table row tag
+					$feed = new XMLFeed( $jsonData );
+					/*
+					 * get key for specific sport type
+					 */
+					$arrayKey = array_keys( $eventTypeArr, $sport );
+					/*
+					 * calculate total values for each column
+					 */
+					$totalActiveEvents += $feed->getActiveEvents( $program, $arrayKey[0], "Active" );
+					$totalInactiveEvents += $feed->getInactiveEvents( $program, $arrayKey[0], "Inactive" );
+					$totalBlockedEvents += $feed->getBlockedEvents( $program, $arrayKey[0], "Blocked" );
+					$totalKompaktEvents += $feed->getKompaktEvents( $program, $arrayKey[0] );
+					/*
+					 * display numbers per event type
+					 */
 					printf( "<tr>" );
-					// create first column 
 					printf( '<td><a href="./index.php?sport='. $sport .'">%s</a></td>', $sport );
-					$arrayKey = array_keys($eventTypeArr, $sport);
-					printf( "<td>%s</td>", countEvents($jsonData, 'EventType', $program, $arrayKey[0]) );
-					//printf( "<td>%s</td>", countInactiveEvents($jsonData, 'EventStatus', $program, 'Inactive') );
-					printf( "<td>&nbsp</td>" );
-					printf( "<td>&nbsp</td>" );
-					printf( "<td>&nbsp</td>" );
-					printf( "<td>&nbsp</td>" );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getTotalEventPerGame($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getInactiveEvents($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getActiveEvents($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getBlockedEvents($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getKompaktEvents( $program, $arrayKey[0] ) );
 					printf("</tr>");
 				}
+				/*
+				 * display total numbers per column
+				 */
+				printf("<tr>");
+				printf( "<td>Total</td>" );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents + $totalActiveEvents + $totalBlockedEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalActiveEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalBlockedEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalKompaktEvents );
+				printf("</tr>");
+				exit();
 			?>
+			
 		</table>
+	
 	</body>
 
 </html>
