@@ -11,10 +11,20 @@ class XMLFeed {
 	var $blockedEvents = array();
 	var $totalEventsPerGame = array();
 	
+	/*
+	 * class constructor
+	 * @array: JSON object for further process
+	 */
 	public function __construct( $array ) {
 		$this->jsonObj = $array;
 	}
 	
+	/*
+	 * get the events associated with a certain program
+	 * @program: the program as String
+	 * @eventType: event type (sport) as String
+	 * @value: value for the event status (Active, Inactive, Blocked)
+	 */
 	private function getEvents( $program, $eventType, $value ) {
 		$retVal = array();
 		
@@ -28,6 +38,11 @@ class XMLFeed {
 		return $retVal;
 	}
 	
+	/*
+	 * returns the number of active events associated with a certain program
+	 * @program: the program as String
+	 * @eventType: event type (sport) as String
+	 */
 	public function getActiveEvents( $program, $eventType ) {
 		
 		$this->activeEvents = $this->getEvents( $program, $eventType, "Active" );
@@ -35,6 +50,11 @@ class XMLFeed {
 		return count( $this->activeEvents );
 	}
 	
+	/*
+	 * returns the number of inactive events associated with a certain program
+	 * @program: the program as String
+	 * @eventType: event type (sport) as String
+	 */
 	public function getInactiveEvents( $program, $eventType ) {
 		
 		$this->inactiveEvents = $this->getEvents( $program, $eventType, "Inactive" );
@@ -42,6 +62,11 @@ class XMLFeed {
 		return count($this->inactiveEvents );
 	}
 	
+	/*
+	 * returns the number of blocked events associated with a certain program
+	 * @program: the program as String
+	 * @eventType: event type (sport) as String
+	 */
 	public function getBlockedEvents( $program, $eventType ) {
 		
 		$this->blockedEvents = $this->getEvents( $program, $eventType, "Blocked" );
@@ -49,6 +74,11 @@ class XMLFeed {
 		return count( $this->blockedEvents );
 	}
 	
+	/*
+	 * returns the number of compact events associated with a certain program
+	 * @program: the program as String
+	 * @eventType: event type (sport) as String
+	 */
 	public function getKompaktEvents( $program, $eventType ) {
 		
 		foreach( (array) $this->jsonObj->{$program} as $event ) {
@@ -60,16 +90,27 @@ class XMLFeed {
 		
 		return count( $this->kompaktEvents );
 	}
-
+	
+	/*
+	 * returns the total number of events associated with a certain program
+	 * @program: the program as String
+	 * @eventType: event type (sport) as String
+	 */
 	public function getTotalEventPerGame( $program, $eventType ) {
 		
 		return $this->getActiveEvents($program, $eventType) + $this->getInactiveEvents($program, $eventType) + $this->getBlockedEvents($program, $eventType);
 		
 	}
 	
-	
+	/*
+	 * destructor for this class
+	 * frees any resources
+	 */
 	function __destruct() {
 		$this->jsonObj = null;
-		$this->activeEvents = null;	
+		$this->activeEvents = null;
+		$this->inactiveEvents = null;
+		$this->blockedEvents = null;
+		$this->kompaktEvents = null;
 	}
 }

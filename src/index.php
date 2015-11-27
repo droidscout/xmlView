@@ -27,7 +27,6 @@ require_once 'functions.php';
 	$command = '/home/admin/tradermonitor/jsonprint.py';
 	$result = shell_exec($command);
 	$jsonData = json_decode($result);
-	//var_dump($jsonData);
 ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
