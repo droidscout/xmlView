@@ -28,7 +28,7 @@ th#programTableHeader {
 	
 }
 
-td.menuBox, a, a:visited{
+th.menuBox, td.menuBox, a, a:visited{
 	color: #f78f1e;
 	width: 40%;
 	font: 1em "Arial Black";
@@ -36,7 +36,7 @@ td.menuBox, a, a:visited{
 	
 }
 
-td.menuBox, a:hover{
+th.menuBox, td.menuBox, a:hover{
 	color: #c36e13;
 	font: 1em "Arial Black";
 	text-decoration: none;

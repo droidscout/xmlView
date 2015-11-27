@@ -9,6 +9,7 @@ class XMLFeed {
 	var $activeEvents = array();
 	var $inactiveEvents = array();
 	var $blockedEvents = array();
+	var $notInactiveEvents = array();
 	var $totalEventsPerGame = array();
 	
 	/*
@@ -43,7 +44,7 @@ class XMLFeed {
 	 * @program: the program as String
 	 * @eventType: event type (sport) as String
 	 */
-	public function getActiveEvents( $program, $eventType ) {
+	public function getActiveEventsCount( $program, $eventType ) {
 		
 		$this->activeEvents = $this->getEvents( $program, $eventType, "Active" );
 		
@@ -55,7 +56,7 @@ class XMLFeed {
 	 * @program: the program as String
 	 * @eventType: event type (sport) as String
 	 */
-	public function getInactiveEvents( $program, $eventType ) {
+	public function getInactiveEventsCount( $program, $eventType ) {
 		
 		$this->inactiveEvents = $this->getEvents( $program, $eventType, "Inactive" );
 		
@@ -67,7 +68,7 @@ class XMLFeed {
 	 * @program: the program as String
 	 * @eventType: event type (sport) as String
 	 */
-	public function getBlockedEvents( $program, $eventType ) {
+	public function getBlockedEventsCount( $program, $eventType ) {
 		
 		$this->blockedEvents = $this->getEvents( $program, $eventType, "Blocked" );
 		
@@ -79,7 +80,7 @@ class XMLFeed {
 	 * @program: the program as String
 	 * @eventType: event type (sport) as String
 	 */
-	public function getKompaktEvents( $program, $eventType ) {
+	public function getKompaktEventsCount( $program, $eventType ) {
 		
 		foreach( (array) $this->jsonObj->{$program} as $event ) {
 			
@@ -96,11 +97,30 @@ class XMLFeed {
 	 * @program: the program as String
 	 * @eventType: event type (sport) as String
 	 */
-	public function getTotalEventPerGame( $program, $eventType ) {
+	public function getTotalEventPerGameCount( $program, $eventType ) {
 		
-		return $this->getActiveEvents($program, $eventType) + $this->getInactiveEvents($program, $eventType) + $this->getBlockedEvents($program, $eventType);
+		return $this->getActiveEventsCount($program, $eventType) + 
+				$this->getInactiveEventsCount($program, $eventType) + 
+					$this->getBlockedEventsCount($program, $eventType);
 		
 	}
+	
+	/*
+	 * returns the number of events which don't have the event status "Inactive" associated with a certain program
+	 * @program: the program as String
+	 */
+	public function getNoInactiveEvents( $program ) {
+		
+		foreach( (array) $this->jsonObj->{$program} as $event ) {
+			if( $event->{'EventStatus'} != "Inactive" ) {
+				$this->notInactiveEvents[$i++] = $event{'EventStatus'};
+			}
+		}
+		
+		return count( $this->notInactiveEvents );
+		
+	}
+	
 	
 	/*
 	 * destructor for this class

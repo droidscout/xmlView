@@ -39,7 +39,7 @@ require_once 'functions.php';
 	<body>
 		<img src="./images/intralot.jpg" width="270" style="display: block; margin-left: auto; margin-right: auto" />
 		<h1>XML-Viewer</h1>
-		
+		<h2><div>Date: <?php $date = date('Y-m-d H:i:s'); printf("%s", $date); ?></div></h2>
 		<table>
 			<tr id="programMenu">
 				<td class="menuBox">
@@ -62,10 +62,10 @@ require_once 'functions.php';
 			</colgroup>
 			<th>Sport type</th>
 			<th>All events</th>
-			<th>Inactive events</th>
-			<th>Active events</th>
-			<th>Blocked events</th>
-			<th>Kompakt events</th>
+			<th><a href="">Inactive events</a></th>
+			<th><a href="">Active events</a></th>
+			<th><a href="">Blocked events</a></th>
+			<th><a href="">Kompakt events</a></th>
 			<?php
 				$totalActiveEvents = 0;
 				$totalInactiveEvents = 0;
@@ -81,20 +81,20 @@ require_once 'functions.php';
 					/*
 					 * calculate total values for each column
 					 */
-					$totalActiveEvents += $feed->getActiveEvents( $program, $arrayKey[0], "Active" );
-					$totalInactiveEvents += $feed->getInactiveEvents( $program, $arrayKey[0], "Inactive" );
-					$totalBlockedEvents += $feed->getBlockedEvents( $program, $arrayKey[0], "Blocked" );
-					$totalKompaktEvents += $feed->getKompaktEvents( $program, $arrayKey[0] );
+					$totalActiveEvents += $feed->getActiveEventsCount( $program, $arrayKey[0], "Active" );
+					$totalInactiveEvents += $feed->getInactiveEventsCount( $program, $arrayKey[0], "Inactive" );
+					$totalBlockedEvents += $feed->getBlockedEventsCount( $program, $arrayKey[0], "Blocked" );
+					$totalKompaktEvents += $feed->getKompaktEventsCount( $program, $arrayKey[0] );
 					/*
 					 * display numbers per event type
 					 */
 					printf( "<tr>" );
 					printf( '<td><a href="./index.php?sport='. $sport .'">%s</a></td>', $sport );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getTotalEventPerGame($program, $arrayKey[0]) );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getInactiveEvents($program, $arrayKey[0]) );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getActiveEvents($program, $arrayKey[0]) );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getBlockedEvents($program, $arrayKey[0]) );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getKompaktEvents( $program, $arrayKey[0] ) );
+					printf( "<td class=\"totalTableValues\">%s</td>", $feed->getTotalEventPerGameCount($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getInactiveEventsCount($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getActiveEventsCount($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getBlockedEventsCount($program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getKompaktEventsCount( $program, $arrayKey[0] ) );
 					printf("</tr>");
 				}
 				/*
