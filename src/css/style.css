@@ -7,11 +7,10 @@ table, tr#programMenu {
 	padding: 10px;
 	text-align: center; 
 	width: 100%;
-	
-	
 }
 
 td.tableValues{
+	border: none;
 	color: #000000;
 	font: 1em "Arial";
 }

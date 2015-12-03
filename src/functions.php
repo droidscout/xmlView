@@ -11,7 +11,7 @@ class XMLFeed {
 	var $blockedEvents = array();
 	var $notInactiveEvents = array();
 	var $totalEventsPerGame = array();
-	
+	var $eventsWEventStatus = array();
 	/*
 	 * class constructor
 	 * @array: JSON object for further process
@@ -26,17 +26,23 @@ class XMLFeed {
 	 * @eventType: event type (sport) as String
 	 * @value: value for the event status (Active, Inactive, Blocked)
 	 */
-	private function getEvents( $program, $eventType, $value ) {
-		$retVal = array();
+	private function getEvents( $program, $eventType ) {
 		
+		$retVal = array();
+
 		foreach( (array) $this->jsonObj->{$program} as $event ) {
 			
-			if( $event->{'EventStatus'} == $value && $event->{'EventType'} == $eventType )
-				$retVal[$i++] = $event->{'EventStatus'};
-			
+			if( $event->{'EventType'} == $eventType ) {	
+				$retVal[$i++] = $event;
+			}
 		}
-		
+
 		return $retVal;
+	}
+	
+	private function getLeagueEventsWStatus( $program, $eventType, $eventStatus, $league ) {
+
+		
 	}
 	
 	/*
@@ -46,7 +52,15 @@ class XMLFeed {
 	 */
 	public function getActiveEventsCount( $program, $eventType ) {
 		
-		$this->activeEvents = $this->getEvents( $program, $eventType, "Active" );
+		if( count($this->activeEvents) == 0 ) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				
+				if( $eventArray->{'EventStatus'} == "Active" ) {
+					
+					$this->activeEvents[$i++] = $eventArray;
+				}
+			}
+		}
 		
 		return count( $this->activeEvents );
 	}
@@ -58,7 +72,15 @@ class XMLFeed {
 	 */
 	public function getInactiveEventsCount( $program, $eventType ) {
 		
-		$this->inactiveEvents = $this->getEvents( $program, $eventType, "Inactive" );
+		if( count($this->inactiveEvents) == 0) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				
+				if( $eventArray->{'EventStatus'} == "Inactive" ) {
+					
+					$this->inactiveEvents[$i++] = $eventArray;
+				}
+			}
+		}
 		
 		return count($this->inactiveEvents );
 	}
@@ -70,7 +92,13 @@ class XMLFeed {
 	 */
 	public function getBlockedEventsCount( $program, $eventType ) {
 		
-		$this->blockedEvents = $this->getEvents( $program, $eventType, "Blocked" );
+		if( count($this->blockedEvents) == 0) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				if( $eventArray->{'EventStatus'} == "Blocked" ) {
+					$this->blockedEvents[$i++] = $eventArray;
+				}
+			}
+		}
 		
 		return count( $this->blockedEvents );
 	}
@@ -82,11 +110,12 @@ class XMLFeed {
 	 */
 	public function getKompaktEventsCount( $program, $eventType ) {
 		
-		foreach( (array) $this->jsonObj->{$program} as $event ) {
-			
-			if( $event->{'PlayIndex'} != "0" && $event->{'EventType'} == $eventType )
-				$this->kompaktEvents[$i++] = $event->{'PlayIndex'};
-				
+		if( count($this->kompaktEvents) == 0) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				if( $eventArray->{'PlayIndex'} != "0" && strtolower($eventArray->{'EventType'}) == strtolower($eventType) ) {
+					$this->kompaktEvents[$i++] = $eventArray;
+				}
+			}
 		}
 		
 		return count( $this->kompaktEvents );
@@ -97,7 +126,7 @@ class XMLFeed {
 	 * @program: the program as String
 	 * @eventType: event type (sport) as String
 	 */
-	public function getTotalEventPerGameCount( $program, $eventType ) {
+	public function getAllEventPerGameCount( $program, $eventType ) {
 		
 		return $this->getActiveEventsCount($program, $eventType) + 
 				$this->getInactiveEventsCount($program, $eventType) + 
@@ -119,6 +148,39 @@ class XMLFeed {
 		
 		return count( $this->notInactiveEvents );
 		
+	}
+
+	public function getEventWStatus( $program, $eventType, $eventStatus ) {
+		$retVal = array();
+		foreach( $this->getEvents($program, $eventType) as $event ) {
+			if( strtolower($event->{'EventStatus'}) == strtolower($eventStatus) ) {
+				$retVal[$i++] = $event;
+			}
+		}
+		return $retVal;
+	}
+	
+	public function getLeagues( $program, $eventType ) {
+		
+		$retVal = array();
+		foreach( $this->getEvents($program, $eventType) as $event ) {
+			if( !in_array($event->{'League'}, $retVal) )
+				$retVal[$i++] = $event->{'League'};		
+		}
+		
+		sort( $retVal, SORT_STRING );
+		return $retVal;
+	}
+
+	public function getEventsPerLeague( $program, $eventType, $eventStatus, $league ) {
+
+		$retVal = array();
+		foreach( $this->getLeagueEventsWStatus( $program, $eventType, $eventStatus, $league ) as $event ) {
+			
+			$retVal[$i++] = $event;
+		}
+		 
+		return $retVal;
 	}
 	
 	
