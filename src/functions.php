@@ -41,8 +41,15 @@ class XMLFeed {
 	}
 	
 	private function getLeagueEventsWStatus( $program, $eventType, $eventStatus, $league ) {
-
+		$retVal = array();
 		
+		foreach( $this->getEvents($program, $eventType) as $event ) {
+			if( $event->{'EventStatus'} == $eventStatus && $event->{'League'} == $league ) {
+				$retVal[$i++] = $event;
+			}
+		}
+		
+		return $retVal;
 	}
 	
 	/*
@@ -173,16 +180,18 @@ class XMLFeed {
 	}
 
 	public function getEventsPerLeague( $program, $eventType, $eventStatus, $league ) {
-
+		
 		$retVal = array();
-		foreach( $this->getLeagueEventsWStatus( $program, $eventType, $eventStatus, $league ) as $event ) {
-			
-			$retVal[$i++] = $event;
+		foreach( $this->getEventWStatus($program, $eventType, $eventStatus) as $event ) {
+			if( $event->{'League'} == $league ) {
+				
+				$retVal[$i++] = $event;
+			}
 		}
-		 
+		
 		return $retVal;
 	}
-	
+
 	
 	/*
 	 * destructor for this class
