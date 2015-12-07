@@ -8,6 +8,7 @@ require_once 'functions.php';
 		$program = 'normal';
 	else {
 		$program = $_GET["prog"];
+		$_SESSION['prog'] = $program;
 	}
 	
 	if( isset($_GET['eventsts']) ) {
@@ -153,9 +154,10 @@ require_once 'functions.php';
 		</table>
 	
 		<?php
-		/*
-		 * Building link to step back
-		 */
+		
+			/*
+			 * Building link to step back
+			 */
 			printf("<table><tr style=\"text-align: left\"><td>");
 			
 			if( isset($program) && isset($eventStatus) &! isset($eventType) ) {
@@ -238,7 +240,24 @@ require_once 'functions.php';
 				// get the key which is associated with the value
 				$arrayKey = array_keys( $eventTypeArr, $eventType );
 				
-				printf("<table>");
+				printf("<table><colgroup>
+				<col span=\"1\" class=\"darkBG\" />
+				<col span=\"1\" class=\"lightBG\" />
+				<col span=\"1\" class=\"darkBG\" />
+				<col span=\"1\" class=\"lightBG\" />
+				<col span=\"1\" class=\"darkBG\" />
+				<col span=\"1\" class=\"lightBG\" />
+				<col span=\"1\" class=\"darkBG\" />
+				<col span=\"1\" class=\"lightBG\" />
+				</colgroup>
+				<th>League</th>
+				<th>Count</th>
+				<th>League</th>
+				<th>Count</th>
+				<th>League</th>
+				<th>Count</th>
+				<th>League</th>
+				<th>Count</th>");
 				
 				$arrayCount = count( $feed->getLeagues($program, $arrayKey[0]) );
 				// we need to replace the eventType=American Football with the current event type
@@ -251,6 +270,7 @@ require_once 'functions.php';
 					printf("<tr>");
 					foreach( $feed->getLeagues($program, $arrayKey[0]) as $league ) {
 						printf( "<td><a href=\"./index.php?". $link . $league . "\">". $league ."</td>" );
+						printf( "<td style=\"text-align: left\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league ) ) ."</td>" );
 					}
 					printf("</tr>");
 				}
@@ -267,8 +287,10 @@ require_once 'functions.php';
 						for( $i = 0; $i <= 3; $i++ ) {
 							
 							$eleCnt = $elementCnt + $i;
-							if( $league != "" )
+							if( $league[$eleCnt] != "" ) {
 								printf( "<td><a href=\"./index.php?". $link . $league[$eleCnt] . "\">". $league[$eleCnt] ."</td>" );
+								printf( "<td class=\"tableValues\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league[$eleCnt]) ) ."</td>" );
+							}
 						}
 						
 						printf("</tr>");
@@ -292,16 +314,11 @@ require_once 'functions.php';
 							<col span='1' class='darkBG' />
 							<col span='1' class='lightBG' />
 							</colgroup>");
-				
+				printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
 				$arrayKey = array_keys( $eventTypeArr, $eventType );
-				var_dump($program);
-				var_dump($arrayKey[0]);
-				var_dump($eventStatus);
-				var_dump($eventLeague);
-
 				foreach( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $eventLeague) as $leagueEvent) {
 					
-					printf( "<tr class=\"tableValuesTop\"><td>Event: </td><td>". $leagueEvent->{'Descr'} ."</td></tr>" );
+					printf( "<tr class=\"tableValuesTop\"><td>Event: </td><td><a href=\"./index.php?evtdetails=true&eventid=". $leagueEvent->{'ID'} ."\">". $leagueEvent->{'Descr'} ."</a></td></tr>" );
 					printf( "<tr><td class=\"tableValues\">Event status: </td><td class=\"tableValues\">". $leagueEvent->{'EventStatus'} ."</td></tr>" );
 					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $leagueEvent->{'Country'} ."</td></tr>" );
 					printf( "<tr><td class=\"tableValues\">League: </td><td class=\"tableValues\">". $leagueEvent->{'LeagueFullDescr'} ." / ". $leagueEvent->{'League'} ."</td></tr>" );
@@ -315,7 +332,27 @@ require_once 'functions.php';
 			}
 			/*
 			 * -----------------------------------------------------------------------------------------------------------------------------------------------
-			 */								
+			 */
+			 if( isset($_GET['evtdetails']) && isset($_GET['eventid']) ) {
+			 	if( strtolower($_GET['evtdetails']) == "true" ) {
+			 		
+			 		printf("<table>");
+					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+			 		$eventDetails = $feed->getEventDetails( $_SESSION['prog'], $_GET['eventid']);
+			 			
+					printf( "<tr class=\"tableValuesTop\"><td>Event: </td><td>". $eventDetails->{'Descr'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Event status: </td><td class=\"tableValues\">". $eventDetails->{'EventStatus'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $eventDetails->{'Country'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">League: </td><td class=\"tableValues\">". $eventDetails->{'LeagueFullDescr'} ." / ". $eventDetails->{'League'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $eventDetails->{'Country'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Bet start date: </td><td class=\"tableValues\">". $eventDetails->{'StartDate'} ."</td></tr>" );
+					printf( "<tr class=\"tableValuesBottom\"><td>Kick off date: </td><td class=\"tableValuesBottom\">". $eventDetails->{'Date'} ."</td></tr>" );
+					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+						
+					printf("</table>");
+			 	}
+			 }
+			 								
 		?>
 		
 	</body>

@@ -188,8 +188,15 @@ class XMLFeed {
 				$retVal[$i++] = $event;
 			}
 		}
-		
 		return $retVal;
+	}
+	
+	public function getEventDetails( $program, $id ) {
+		
+		foreach( $this->jsonObj->{$program} as $event) {
+			if( $event->{'ID'} == $id )
+				return $event;
+		}
 	}
 
 	
