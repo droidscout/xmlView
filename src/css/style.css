@@ -13,6 +13,7 @@ td.tableValues{
 	border: none;
 	color: #000000;
 	font: 1em "Arial";
+	text-align:center;
 }
 
 td.totalTableValues{
@@ -27,7 +28,7 @@ th#programTableHeader {
 	
 }
 
-th.menuBox, td.menuBox, a, a:visited{
+th.menuBox a, td.menuBox a, td.menuBox a:visited{
 	color: #f78f1e;
 	width: 40%;
 	font: 1em "Arial Black";
@@ -35,7 +36,7 @@ th.menuBox, td.menuBox, a, a:visited{
 	
 }
 
-th.menuBox, td.menuBox, a:hover{
+th.menuBox a:hover, td.menuBox a:hover{
 	color: #c36e13;
 	font: 1em "Arial Black";
 	text-decoration: none;

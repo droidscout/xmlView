@@ -270,7 +270,7 @@ require_once 'functions.php';
 					printf("<tr>");
 					foreach( $feed->getLeagues($program, $arrayKey[0]) as $league ) {
 						printf( "<td><a href=\"./index.php?". $link . $league . "\">". $league ."</td>" );
-						printf( "<td style=\"text-align: left\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league ) ) ."</td>" );
+						printf( "<td class=\"tableValues\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league ) ) ."</td>" );
 					}
 					printf("</tr>");
 				}
@@ -338,15 +338,37 @@ require_once 'functions.php';
 			 		
 			 		printf("<table>");
 					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+					
 			 		$eventDetails = $feed->getEventDetails( $_SESSION['prog'], $_GET['eventid']);
-			 			
-					printf( "<tr class=\"tableValuesTop\"><td>Event: </td><td>". $eventDetails->{'Descr'} ."</td></tr>" );
+			 		
+					printf( "<tr><td class=\"tableValues\">Event Id: </td><td class=\"tableValues\">". $eventDetails->{'ID'} ."</td></tr>" );	
+					printf( "<tr><td class=\"tableValues\">Event: </td><td class=\"tableValues\">". $eventDetails->{'Descr'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Event type: </td><td class=\"tableValues\">". $eventTypeArr[$eventDetails->{'EventType'}] ."&nbsp(". $eventDetails->{'EventType'} .")</td></tr>" );
 					printf( "<tr><td class=\"tableValues\">Event status: </td><td class=\"tableValues\">". $eventDetails->{'EventStatus'} ."</td></tr>" );
 					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $eventDetails->{'Country'} ."</td></tr>" );
 					printf( "<tr><td class=\"tableValues\">League: </td><td class=\"tableValues\">". $eventDetails->{'LeagueFullDescr'} ." / ". $eventDetails->{'League'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $eventDetails->{'Country'} ."</td></tr>" );
 					printf( "<tr><td class=\"tableValues\">Bet start date: </td><td class=\"tableValues\">". $eventDetails->{'StartDate'} ."</td></tr>" );
-					printf( "<tr class=\"tableValuesBottom\"><td>Kick off date: </td><td class=\"tableValuesBottom\">". $eventDetails->{'Date'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Kickoff date: </td><td class=\"tableValues\">". $eventDetails->{'Date'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">FinalWithHandicap: </td><td class=\"tableValues\">". $eventDetails->{'FinalWithHandicap'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">First half score: </td><td class=\"tableValues\">". $eventDetails->{'FirsthalfScore'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Neutral: </td><td class=\"tableValues\">". $eventDetails->{'Neutral'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">PlayIndex: </td><td class=\"tableValues\">". $eventDetails->{'PlayIndex'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Priority: </td><td class=\"tableValues\">". $eventDetails->{'Priority'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">SE: </td><td class=\"tableValues\">". $eventDetails->{'SE'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">SevDelay: </td><td class=\"tableValues\">". $eventDetails->{'SevDelay'} ."</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Total games: </td><td class=\"tableValues\">". $eventDetails->{'TotalGames'} ."</td></tr>" );
+					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+					printf( "<tr><td class=\"tableValues\">Markets: </td></tr>" );
+					printf( "<tr><td>&nbsp</td><td><table>");
+					printf("<th>ID</th>");
+					printf("<th>Market</th>");
+					printf("<th>Descr:</th>");
+					printf("<th>Odd</th>");
+					foreach( (array) $feed->getEventDetails( $_SESSION['prog'], $_GET['eventid'])->{'outcomes'} as $market ) {
+						printf("<tr><td class=\"tableValues\">". $market->{'ID'} ."</td><td class=\"tableValues\">". $market->{'Market'} ."</td><td class=\"tableValues\">". $market->{'Descr'} ."</td><td class=\"tableValues\">". $market->{'Odd'} ."</td><td>" ); 
+					}
+					
+					printf( "</table></td></tr>");
 					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
 						
 					printf("</table>");
