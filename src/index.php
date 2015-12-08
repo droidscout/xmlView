@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once 'functions.php';
+require_once 'XMLFeed.php';
+require_once 'Layout.php';
 	
 	$program = "";
 	
@@ -8,7 +9,7 @@ require_once 'functions.php';
 		$program = 'normal';
 	else {
 		$program = $_GET["prog"];
-		$_SESSION['prog'] = $program;
+		//$_SESSION['prog'] = $program;
 	}
 	
 	if( isset($_GET['eventsts']) ) {
@@ -35,6 +36,10 @@ require_once 'functions.php';
 	
 	if( isset($_GET['league']) ) {
 		$eventLeague = $_GET['league'];
+	}
+	
+	if( isset($_GET['sport']) ) {
+		$sportType = $_GET['sport'];
 	}
 	
 	$eventTypeArr = array(
@@ -72,7 +77,7 @@ require_once 'functions.php';
 	<head>
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="css/style.css" />
-		<link rel="stylesheet" href="css/evenstsstyle.css" />
+		<!--<link rel="stylesheet" href="css/evenstsstyle.css" />-->
 		<script type="text/javascript" src="js/jsfunctions.js"></script>
 		<title>XML- Viewer</title>
 	</head>
@@ -103,10 +108,10 @@ require_once 'functions.php';
 			</colgroup>
 			<th>Sport type</th>
 			<th>All events</th>
-			<th><a href="<?php printf('./index.php?prog='. $program .'&eventsts=inactive');?>">Inactive events</a></th>
-			<th><a href="<?php printf('./index.php?prog='. $program .'&eventsts=active');?>">Active events</a></th>
-			<th><a href="<?php printf('./index.php?prog='. $program .'&eventsts=blocked');?>">Blocked events</a></th>
-			<th><a href="<?php printf('./index.php?prog='. $program .'&eventsts=kompakt');?>">Kompakt events</a></th>
+			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=inactive');?>">Inactive events</a></th>
+			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=active');?>">Active events</a></th>
+			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=blocked');?>">Blocked events</a></th>
+			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=kompakt');?>">Kompakt events</a></th>
 			<?php
 				$totalActiveEvents = 0;
 				$totalInactiveEvents = 0;
@@ -130,18 +135,18 @@ require_once 'functions.php';
 					 * display numbers per event type
 					 */
 					printf( "<tr>" );
-					printf( '<td><a href="./eventType.php?sport='. $sport .'">%s</a></td>', $sport );
-					printf( "<td class=\"totalTableValues\">%s</td>", $feed->getAllEventPerGameCount($program, $arrayKey[0]) );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getInactiveEventsCount($program, $arrayKey[0]) );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getActiveEventsCount($program, $arrayKey[0]) );
-					printf( "<td class=\"tableValues\">%s</td>", $feed->getBlockedEventsCount($program, $arrayKey[0]) );
+					printf( "<td class\"tableValuesRowHeader\"><!--<a href=\"./index.php?sport=\". $sport .\">-->". $sport ."<!--</a>--></td>" );
+					printf( "<td class=\"totalTableValues\">%s</td>", $feed->getAllEventPerGameCount( $program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getInactiveEventsCount( $program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getActiveEventsCount( $program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getBlockedEventsCount( $program, $arrayKey[0]) );
 					printf( "<td class=\"tableValues\">%s</td>", $feed->getKompaktEventsCount( $program, $arrayKey[0] ) );
 					printf("</tr>");
 				}
 				/*
 				 * display total numbers per column
 				 */
-				printf("<tr>");
+				printf( "<tr>" );
 				printf( "<td>Total</td>" );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents + $totalActiveEvents + $totalBlockedEvents );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents );
@@ -158,32 +163,34 @@ require_once 'functions.php';
 			/*
 			 * Building link to step back
 			 */
-			printf("<table><tr style=\"text-align: left\"><td>");
+			printf( "<table><tr style=\"text-align: left\"><td class=\"menuBox\">" );
 			
 			if( isset($program) && isset($eventStatus) &! isset($eventType) ) {
 				
 				if( $program == "normal" ) {
-					 printf( "<a href=\"./index.php?prog=". $program ."\">Full program</a>" ); 
+					 printf( "<a href=\"./index.php?prog=".$program."\">Full program</a>" ); 
 				} 
 				elseif( $program == "slv" ) {
-					  printf( "<a href=\"./index.php?prog=". $program ."\">Reduced program (SLV)</a>"); 
+					  printf( "<a href=\"./index.php?prog=".$program."\">Reduced program (SLV)</a>"); 
 				}
 				
-				printf( "/ ". $eventStatus ." events" );
+				printf( " / ".$eventStatus." events" );
+				printf( "</td></tr></table>" );
 				
 			}
 			elseif( isset($program) && isset($eventStatus) && isset($eventType) &! isset($eventLeague) ) {
 				
 				if( $program == "normal" ) {
-					 printf( "<a href=\"./index.php?prog=". $program ."\">Full program</a>" ); 
+					 printf( "<a href=\"./index.php?prog=".$program."\">Full program</a>" ); 
 				} 
 				elseif( $program == "slv" ) {
-					  printf( "<a href=\"./index.php?prog=". $program ."\">Reduced program (SLV)</a>"); 
+					  printf( "<a href=\"./index.php?prog=".$program."\">Reduced program (SLV)</a>"); 
 				}
 				
-				printf( "/<a href=\./index.php?prog=". $program ."&eventsts=". $_GET["eventsts"] .">".$eventStatus." events</a>" );
+				printf( " / <a href=\./index.php?prog=". $program ."&eventsts=". $_GET["eventsts"] .">".$eventStatus." events</a>" );
 				
-				printf( "/ ". $eventType );
+				printf( " / ".$eventType );
+				printf( "</td></tr></table>" );
 			}
 			elseif( isset($program) && isset($eventStatus) && isset($eventType) && isset($eventLeague) ) {
 				
@@ -193,20 +200,39 @@ require_once 'functions.php';
 				elseif( $program == "slv" ) {
 					  printf( "<a href=\"./index.php?prog=". $program ."\">Reduced program (SLV)</a>"); 
 				}
-				printf( "/<a href=\./index.php?prog=". $program ."&eventsts=". $_GET["eventsts"] .">".$eventStatus." events</a>" );
-				printf( "/<a href=\./index.php?prog=". $program ."&eventsts=". $_GET["eventsts"] ."&eventType=". $eventType .">". $eventType ."</a>" );
+				printf( " / <a href=\./index.php?prog=". $program ."&eventsts=". $_GET["eventsts"] .">".$eventStatus." events</a>" );
+				printf( " / <a href=\./index.php?prog=". $program ."&eventsts=". $_GET["eventsts"] ."&eventType=".$eventType.">".$eventType."</a>" );
 				
-				printf( "/ ". $eventLeague );
+				printf( " / ".$eventLeague );
+				printf( "</td></tr></table>" );
 			}
+			/*elseif( isset($sportType) &! isset($_GET['prog']) &! isset($eventStatus) ) {
+					
+				printf( $sportType. "</td></tr>" );
+				
+				printf( "<tr><td><a href=\"./index.php?sport=". $sportType ."&prog=normal\">Full program</td>");
+				printf( "<td><a href=\"./index.php?sport=". $sportType ."&prog=slv\">Reduced program (SLV)</td></tr></table>" );			
+			}
+			elseif( isset($sportType) && isset($_GET['prog']) &! isset($eventStatus) ) {
+				
+				if( $program == "normal" ) {
+					printf( "<a href=\"./index.php?sport=" . $sportType . "\">" . $sportType ."</a>/ Full program");
+				} 
+				elseif( $program == "slv" ) {
+					printf( "<a href=\"./index.php?sport=" . $sportType . "\">" . $sportType ."</a>/ Reduced program (SLV)");
+				}
+				
+				printf( "</td></tr></table>" );
+			}*/
 			
-			printf("</td></tr></table>");
+			
 			/*
 			 * -----------------------------------------------------------------------------------------------------------------------------------------------
 			 */
 			/*
 			 * Building links with event type per event status
 			 */
-			printf("<table><tr>");
+			printf( "<table><tr id=\"programMenu\">" );
 			
 			foreach( $eventTypeArr as $sport ) {
 				
@@ -230,17 +256,17 @@ require_once 'functions.php';
 					}
 					
 					$link .= "eventType=". $sport;
-					printf("<td><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
+					printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
 				} 
 			}
-			printf("</tr></table>");
+			printf( "</tr></table>" );
 			
 			if( isset($eventType) ) {
 				
 				// get the key which is associated with the value
 				$arrayKey = array_keys( $eventTypeArr, $eventType );
 				
-				printf("<table><colgroup>
+				printf("<table><!--<colgroup>
 				<col span=\"1\" class=\"darkBG\" />
 				<col span=\"1\" class=\"lightBG\" />
 				<col span=\"1\" class=\"darkBG\" />
@@ -257,7 +283,7 @@ require_once 'functions.php';
 				<th>League</th>
 				<th>Count</th>
 				<th>League</th>
-				<th>Count</th>");
+				<th>Count</th>-->");
 				
 				$arrayCount = count( $feed->getLeagues($program, $arrayKey[0]) );
 				// we need to replace the eventType=American Football with the current event type
@@ -267,10 +293,19 @@ require_once 'functions.php';
 				$link .= "&league=";
 				
 				if( $arrayCount <= 4 ) {
+					printf( "<colspan>" );
+					$count = 0;
+					do {
+						printf("<col span=\"1\" class=\"darkBG\" />
+								<col span=\"1\" class=\"lightBG\" />" );
+						$count++;
+					} while( $count <= $arrayCount );
+					printf( "<colspan>" );
+					
 					printf("<tr>");
 					foreach( $feed->getLeagues($program, $arrayKey[0]) as $league ) {
-						printf( "<td><a href=\"./index.php?". $link . $league . "\">". $league ."</td>" );
-						printf( "<td class=\"tableValues\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league ) ) ."</td>" );
+						printf( "<td class=\"menuBox\"><a href=\"./index.php?". $link . $league . "\">". $league ."</td>" );
+						printf( "<td class=\"totalTableValues\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league ) ) ."</td>" );
 					}
 					printf("</tr>");
 				}
@@ -293,7 +328,7 @@ require_once 'functions.php';
 							}
 						}
 						
-						printf("</tr>");
+						printf( "</tr>" );
 						$elementCnt += 4;
 						$rowCnt++;
 						
@@ -336,7 +371,7 @@ require_once 'functions.php';
 			 if( isset($_GET['evtdetails']) && isset($_GET['eventid']) ) {
 			 	if( strtolower($_GET['evtdetails']) == "true" ) {
 			 		
-			 		printf("<table>");
+			 		printf( "<table>" );
 					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
 					
 			 		$eventDetails = $feed->getEventDetails( $_SESSION['prog'], $_GET['eventid']);
@@ -371,7 +406,7 @@ require_once 'functions.php';
 					printf( "</table></td></tr>");
 					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
 						
-					printf("</table>");
+					printf( "</table>" );
 			 	}
 			 }
 			 								

@@ -1,4 +1,14 @@
-table, tr#programMenu {
+table {
+	background-color: #454d3e;
+	color: #f78f1e;
+	font: 1em "Arial Black";
+	margin-left: auto;
+	margin-right: auto;
+	padding: 10px;
+	width: 100%;
+}
+
+table tr#programMenu {
 	background-color: #454d3e;
 	color: #f78f1e;
 	font: 1em "Arial Black";
@@ -16,10 +26,17 @@ td.tableValues{
 	text-align:center;
 }
 
+table tr td.tableValuesRowHeader{
+	padding: 20px;
+	color: #000000;
+	font: 1em "Arial";
+}
+
 td.totalTableValues{
 	color: #000000;
 	font: 1em "Arial Black";
-	font-weight: bold
+	font-weight: bold;
+	text-align:center;
 }
 
 th#programTableHeader {
