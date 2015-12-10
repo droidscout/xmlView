@@ -4,7 +4,7 @@ table {
 	font: 1em "Arial Black";
 	margin-left: auto;
 	margin-right: auto;
-	padding: 10px;
+	padding: 8px;
 	width: 100%;
 }
 
@@ -14,7 +14,6 @@ table tr#programMenu {
 	font: 1em "Arial Black";
 	margin-left: auto;
 	margin-right: auto;
-	padding: 10px;
 	text-align: center; 
 	width: 100%;
 }
@@ -26,8 +25,8 @@ td.tableValues{
 	text-align:center;
 }
 
-table tr td.tableValuesRowHeader{
-	padding: 20px;
+tr td.tablevaluesrowheader{
+	padding-left: 10px;
 	color: #000000;
 	font: 1em "Arial";
 }
@@ -42,7 +41,6 @@ td.totalTableValues{
 th#programTableHeader {
 	margin-left: auto;
 	margin-right: auto;
-	
 }
 
 th.menuBox a, td.menuBox a, td.menuBox a:visited{
@@ -55,8 +53,59 @@ th.menuBox a, td.menuBox a, td.menuBox a:visited{
 
 th.menuBox a:hover, td.menuBox a:hover{
 	color: #c36e13;
+}
+
+
+td.leagueBox, td.leagueBox a, td.leagueBox a:visited{
+	color: #f78f1e;
+	width: 12%;
+	padding-left:5px;
 	font: 1em "Arial Black";
 	text-decoration: none;
+}
+
+td.leagueBox a:hover{
+	color: #c36e13;
+}
+
+td.eventHeader, td.eventHeader a, td.eventHeader a:visited{
+	color: #f78f1e;
+	width:50%;
+	padding-left: 5px;
+	font: 1em "Arial Black";
+	text-decoration: none;
+}
+
+td.eventHeader a:hover{
+	color: #c36e13;
+}
+
+th.marketBox, td.marketBox {
+	color: #000000;
+	padding-left:5px;
+	font: 1em "Arial Black";
+	text-decoration: none;
+}
+
+td.counter {
+	color: #000000;
+	width: 12%;
+	padding-left:5px;
+	font: 1em "Arial Black";
+	text-decoration: none;
+	text-align: center;
+}
+
+tr.tableValuesTop{
+	border-top: 1px solid #000000;
+	color: #000000;
+	font: 1em "Arial";
+}
+
+tr.tableValuesBottom{
+	border-bottom: 1px solid #000000;
+	color: #000000;
+	font: 1em "Arial";
 }
 
 colgroup, col, .lightBG{

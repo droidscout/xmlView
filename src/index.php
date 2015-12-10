@@ -87,6 +87,19 @@ require_once 'Layout.php';
 		<h1>XML-Viewer</h1>
 		<h2><div>Date: <?php $date = date('Y-m-d H:i'); printf("%s", $date); ?></div></h2>
 		<table>
+			<tr>
+				<td>
+					
+				<form action="index.php">
+					<label>Search for Event-Id:</label>
+					<input type="hidden" name="evtdetails" value="true"/>
+					<input type="search" id="" name="eventid" />
+					<button>Go</button>
+				</form>
+				</td>
+			</tr>
+		</table>
+		<table>
 			<tr id="programMenu">
 				<td class="menuBox">
 					<a onclick="toggleLink(this.id)" id="full" href="./index.php?prog=normal">Full program</a>
@@ -135,7 +148,7 @@ require_once 'Layout.php';
 					 * display numbers per event type
 					 */
 					printf( "<tr>" );
-					printf( "<td class\"tableValuesRowHeader\"><!--<a href=\"./index.php?sport=\". $sport .\">-->". $sport ."<!--</a>--></td>" );
+					printf( "<td class=\"marketBox\"><!--<a href=\"./index.php?sport=\". $sport .\">-->". $sport ."<!--</a>--></td>" );
 					printf( "<td class=\"totalTableValues\">%s</td>", $feed->getAllEventPerGameCount( $program, $arrayKey[0]) );
 					printf( "<td class=\"tableValues\">%s</td>", $feed->getInactiveEventsCount( $program, $arrayKey[0]) );
 					printf( "<td class=\"tableValues\">%s</td>", $feed->getActiveEventsCount( $program, $arrayKey[0]) );
@@ -147,7 +160,7 @@ require_once 'Layout.php';
 				 * display total numbers per column
 				 */
 				printf( "<tr>" );
-				printf( "<td>Total</td>" );
+				printf( "<td class=\"marketBox\">Total</td>" );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents + $totalActiveEvents + $totalBlockedEvents );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalActiveEvents );
@@ -288,24 +301,18 @@ require_once 'Layout.php';
 				$arrayCount = count( $feed->getLeagues($program, $arrayKey[0]) );
 				// we need to replace the eventType=American Football with the current event type
 				// ugly workaround, since there might be situations where the string eventType=American Football might not be found
-				$link = str_replace( "eventType=American Football", "eventType=". $eventType, $link );
+				//$link = str_replace( "eventType=American Football", "eventType=". $eventType, $link );
 				
-				$link .= "&league=";
+				$link = "prog=" .$program. "&eventsts=" .$_GET['eventsts']. "&eventType=" .$_GET['eventType']. "&league=";
+				$tableLayout = new Layout();
+				$tableLayout->createColumnStyle( $arrayCount ); 
 				
 				if( $arrayCount <= 4 ) {
-					printf( "<colspan>" );
-					$count = 0;
-					do {
-						printf("<col span=\"1\" class=\"darkBG\" />
-								<col span=\"1\" class=\"lightBG\" />" );
-						$count++;
-					} while( $count <= $arrayCount );
-					printf( "<colspan>" );
-					
+
 					printf("<tr>");
 					foreach( $feed->getLeagues($program, $arrayKey[0]) as $league ) {
-						printf( "<td class=\"menuBox\"><a href=\"./index.php?". $link . $league . "\">". $league ."</td>" );
-						printf( "<td class=\"totalTableValues\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league ) ) ."</td>" );
+						printf( "<td class=\"leagueBox\"><a href=\"./index.php?". $link . $league . "\">". $league ."</td>" );
+						printf( "<td class=\"counter\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league ) ) ."</td>" );
 					}
 					printf("</tr>");
 				}
@@ -323,8 +330,8 @@ require_once 'Layout.php';
 							
 							$eleCnt = $elementCnt + $i;
 							if( $league[$eleCnt] != "" ) {
-								printf( "<td><a href=\"./index.php?". $link . $league[$eleCnt] . "\">". $league[$eleCnt] ."</td>" );
-								printf( "<td class=\"tableValues\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league[$eleCnt]) ) ."</td>" );
+								printf( "<td class=\"leagueBox\"><a href=\"./index.php?". $link . $league[$eleCnt] . "\">". $league[$eleCnt] ."</td>" );
+								printf( "<td class=\"counter\">" . count( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $league[$eleCnt]) ) ."</td>" );
 							}
 						}
 						
@@ -344,7 +351,7 @@ require_once 'Layout.php';
 
 			if( isset($eventLeague) ) {
 					
-				printf("<table cellspacing=\"0\" cellpadding=\"1\">
+				printf("<table>
 							<colgroup>
 							<col span='1' class='darkBG' />
 							<col span='1' class='lightBG' />
@@ -353,13 +360,13 @@ require_once 'Layout.php';
 				$arrayKey = array_keys( $eventTypeArr, $eventType );
 				foreach( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $eventLeague) as $leagueEvent) {
 					
-					printf( "<tr class=\"tableValuesTop\"><td>Event: </td><td><a href=\"./index.php?evtdetails=true&eventid=". $leagueEvent->{'ID'} ."\">". $leagueEvent->{'Descr'} ."</a></td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Event status: </td><td class=\"tableValues\">". $leagueEvent->{'EventStatus'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $leagueEvent->{'Country'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">League: </td><td class=\"tableValues\">". $leagueEvent->{'LeagueFullDescr'} ." / ". $leagueEvent->{'League'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $leagueEvent->{'Country'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Bet start date: </td><td class=\"tableValues\">". $leagueEvent->{'StartDate'} ."</td></tr>" );
-					printf( "<tr class=\"tableValuesBottom\"><td>Kick off date: </td><td class=\"tableValuesBottom\">". $leagueEvent->{'Date'} ."</td></tr>" );
+					printf( "<tr><td class=\"marketBox\">Event: </td><td class=\"eventHeader\"><a href=\"./index.php?evtdetails=true&eventid=". $leagueEvent->{'ID'} ."\">".$leagueEvent->{'Descr'} ."</a></td></tr>" );
+					printf( "<tr><td class=\"marketBox\">Event status: </td><td class=\"marketBox\">". $leagueEvent->{'EventStatus'} ."</td></tr>" );
+					printf( "<tr><td class=\"marketBox\">Country: </td><td class=\"marketBox\">". $leagueEvent->{'Country'} ."</td></tr>" );
+					printf( "<tr><td class=\"marketBox\">League: </td><td class=\"marketBox\">". $leagueEvent->{'LeagueFullDescr'} ." / ". $leagueEvent->{'League'} ."</td></tr>" );
+					printf( "<tr><td class=\"marketBox\">Country: </td><td class=\"marketBox\">". $leagueEvent->{'Country'} ."</td></tr>" );
+					printf( "<tr><td class=\"marketBox\">Bet start date: </td><td class=\"marketBox\">". $leagueEvent->{'StartDate'} ."</td></tr>" );
+					printf( "<tr><td class=\"marketBox\">Kick off date: </td><td class=\"marketBox\">". $leagueEvent->{'Date'} ."</td></tr>" );
 					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
 				}
 				
@@ -371,42 +378,58 @@ require_once 'Layout.php';
 			 if( isset($_GET['evtdetails']) && isset($_GET['eventid']) ) {
 			 	if( strtolower($_GET['evtdetails']) == "true" ) {
 			 		
-			 		printf( "<table>" );
-					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+					$eventDetails = $feed->getEventDetails( $program, $_GET['eventid']);
 					
-			 		$eventDetails = $feed->getEventDetails( $_SESSION['prog'], $_GET['eventid']);
-			 		
-					printf( "<tr><td class=\"tableValues\">Event Id: </td><td class=\"tableValues\">". $eventDetails->{'ID'} ."</td></tr>" );	
-					printf( "<tr><td class=\"tableValues\">Event: </td><td class=\"tableValues\">". $eventDetails->{'Descr'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Event type: </td><td class=\"tableValues\">". $eventTypeArr[$eventDetails->{'EventType'}] ."&nbsp(". $eventDetails->{'EventType'} .")</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Event status: </td><td class=\"tableValues\">". $eventDetails->{'EventStatus'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Country: </td><td class=\"tableValues\">". $eventDetails->{'Country'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">League: </td><td class=\"tableValues\">". $eventDetails->{'LeagueFullDescr'} ." / ". $eventDetails->{'League'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Bet start date: </td><td class=\"tableValues\">". $eventDetails->{'StartDate'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Kickoff date: </td><td class=\"tableValues\">". $eventDetails->{'Date'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">FinalWithHandicap: </td><td class=\"tableValues\">". $eventDetails->{'FinalWithHandicap'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">First half score: </td><td class=\"tableValues\">". $eventDetails->{'FirsthalfScore'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Neutral: </td><td class=\"tableValues\">". $eventDetails->{'Neutral'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">PlayIndex: </td><td class=\"tableValues\">". $eventDetails->{'PlayIndex'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Priority: </td><td class=\"tableValues\">". $eventDetails->{'Priority'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">SE: </td><td class=\"tableValues\">". $eventDetails->{'SE'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">SevDelay: </td><td class=\"tableValues\">". $eventDetails->{'SevDelay'} ."</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Total games: </td><td class=\"tableValues\">". $eventDetails->{'TotalGames'} ."</td></tr>" );
-					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
-					printf( "<tr><td class=\"tableValues\">Markets: </td></tr>" );
-					printf( "<tr><td>&nbsp</td><td><table>");
-					printf("<th>ID</th>");
-					printf("<th>Market</th>");
-					printf("<th>Descr:</th>");
-					printf("<th>Odd</th>");
-					foreach( (array) $feed->getEventDetails( $_SESSION['prog'], $_GET['eventid'])->{'outcomes'} as $market ) {
-						printf("<tr><td class=\"tableValues\">". $market->{'ID'} ."</td><td class=\"tableValues\">". $market->{'Market'} ."</td><td class=\"tableValues\">". $market->{'Descr'} ."</td><td class=\"tableValues\">". $market->{'Odd'} ."</td><td>" ); 
-					}
-					
-					printf( "</table></td></tr>");
-					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+					if( !empty($eventDetails) ) {
+				 		printf( "<table><colgroup>
+								<col span='1' class='darkBG' />
+								<col span='1' class='lightBG' />
+								</colgroup>" );
+						printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+				 		
+						printf( "<tr><td class=\"marketBox\">Event Id: </td><td class=\"marketBox\">". $eventDetails->{'ID'} ."</td></tr>" );	
+						printf( "<tr><td class=\"marketBox\">Event: </td><td class=\"marketBox\">". $eventDetails->{'Descr'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Event type: </td><td class=\"marketBox\">". $eventTypeArr[$eventDetails->{'EventType'}] ."&nbsp(". $eventDetails->{'EventType'} .")</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Event status: </td><td class=\"marketBox\">". $eventDetails->{'EventStatus'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Country: </td><td class=\"marketBox\">". $eventDetails->{'Country'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">League: </td><td class=\"marketBox\">". $eventDetails->{'LeagueFullDescr'} ." / ". $eventDetails->{'League'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Bet start date: </td><td class=\"marketBox\">". $eventDetails->{'StartDate'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Kickoff date: </td><td class=\"marketBox\">". $eventDetails->{'Date'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">FinalWithHandicap: </td><td class=\"marketBox\">". $eventDetails->{'FinalWithHandicap'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">First half score: </td><td class=\"marketBox\">". $eventDetails->{'FirstHalfScore'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Second half score: </td><td class=\"marketBox\">". $eventDetails->{'SecondHalfScore'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Neutral: </td><td class=\"marketBox\">". $eventDetails->{'Neutral'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">PlayIndex: </td><td class=\"marketBox\">". $eventDetails->{'PlayIndex'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Priority: </td><td class=\"marketBox\">". $eventDetails->{'Priority'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">SE: </td><td class=\"marketBox\">". $eventDetails->{'SE'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">SevDelay: </td><td class=\"marketBox\">". $eventDetails->{'SevDelay'} ."</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Total games: </td><td class=\"marketBox\">". $eventDetails->{'TotalGames'} ."</td></tr>" );
+						printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+						printf( "<tr><td class=\"marketBox\">Markets: </td></tr>" );
+						printf( "<tr><td>&nbsp</td><td><table><colgroup>
+								<col span='1' class='darkBG' />
+								<col span='1' class='lightBG' />
+								<col span='1' class='darkBG' />
+								<col span='1' class='lightBG' />
+								</colgroup>");
+						printf("<th>ID</th>");
+						printf("<th>Market</th>");
+						printf("<th>Descr:</th>");
+						printf("<th>Odd</th>");
+						foreach( (array) $feed->getEventDetails( $program, $_GET['eventid'])->{'outcomes'} as $market ) {
+							printf("<tr><td class=\"marketBox\">". $market->{'ID'} ."</td><td class=\"marketBox\">"
+							. $market->{'Market'} ."</td><td class=\"marketBox\">". $market->{'Descr'} ."</td>
+							<td class=\"marketBox\">". $market->{'Odd'} ."</td><td>" ); 
+						}
 						
-					printf( "</table>" );
+						printf( "</table></td></tr>");
+						//printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
+							
+						printf( "</table>" );
+					}
+					else {
+						printf( "<table><tr><td>No Event found with Id: ". $_GET['eventid'] ."</td></tr></table>" );		
+					}
 			 	}
 			 }
 			 								
