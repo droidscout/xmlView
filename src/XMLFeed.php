@@ -129,6 +129,24 @@ class XMLFeed {
 	}
 	
 	/*
+	 * returns the number of compact events associated with a certain program
+	 * @program: the program as String
+	 * @eventType: event type (sport) as String
+	 */
+	public function getKompaktEvents( $program, $eventType ) {
+		$retVal = array();
+		if( count($this->kompaktEvents) == 0) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				if( $eventArray->{'PlayIndex'} != "0" && $eventArray->{'EventType'} == $eventType ) {
+					$retVal[$i++] = $eventArray;
+				}
+			}
+		}
+
+		return $retVal;
+	}
+	
+	/*
 	 * returns the total number of events associated with a certain program
 	 * @program: the program as String
 	 * @eventType: event type (sport) as String
@@ -159,9 +177,18 @@ class XMLFeed {
 
 	public function getEventWStatus( $program, $eventType, $eventStatus ) {
 		$retVal = array();
-		foreach( $this->getEvents($program, $eventType) as $event ) {
-			if( strtolower($event->{'EventStatus'}) == strtolower($eventStatus) ) {
-				$retVal[$i++] = $event;
+		if( strtolower($eventStatus) == "kompakt" ) {
+			foreach( $this->getEvents($program, $eventType) as $event ) {
+				if( strtolower($event->{'PlayIndex'}) != "0" ) {
+					$retVal[$i++] = $event;
+				}
+			}
+		}
+		else {
+			foreach( $this->getEvents($program, $eventType) as $event ) {
+				if( strtolower($event->{'EventStatus'}) == strtolower($eventStatus) ) {
+					$retVal[$i++] = $event;
+				}
 			}
 		}
 		return $retVal;
@@ -174,7 +201,7 @@ class XMLFeed {
 			if( !in_array($event->{'League'}, $retVal) )
 				$retVal[$i++] = $event->{'League'};		
 		}
-		
+	
 		sort( $retVal, SORT_STRING );
 		return $retVal;
 	}
@@ -184,10 +211,10 @@ class XMLFeed {
 		$retVal = array();
 		foreach( $this->getEventWStatus($program, $eventType, $eventStatus) as $event ) {
 			if( $event->{'League'} == $league ) {
-				
 				$retVal[$i++] = $event;
 			}
 		}
+
 		return $retVal;
 	}
 	

@@ -48,10 +48,10 @@ require_once 'Layout.php';
 		'3' => "Ice Hockey",  
 		'4' => "Tennis", 
 		'5' => "Handball",
-		'6' => "Baseball",
+		//'6' => "Baseball",
 		'7' => "Volleyball",
-		'8' => "Golf",
-		'9' => "Polo",
+		//'8' => "Golf",
+		//'9' => "Polo",
 		'10' => "Antepost",
 		'11' => "American Football" 
 		);
@@ -219,24 +219,6 @@ require_once 'Layout.php';
 				printf( " / ".$eventLeague );
 				printf( "</td></tr></table>" );
 			}
-			/*elseif( isset($sportType) &! isset($_GET['prog']) &! isset($eventStatus) ) {
-					
-				printf( $sportType. "</td></tr>" );
-				
-				printf( "<tr><td><a href=\"./index.php?sport=". $sportType ."&prog=normal\">Full program</td>");
-				printf( "<td><a href=\"./index.php?sport=". $sportType ."&prog=slv\">Reduced program (SLV)</td></tr></table>" );			
-			}
-			elseif( isset($sportType) && isset($_GET['prog']) &! isset($eventStatus) ) {
-				
-				if( $program == "normal" ) {
-					printf( "<a href=\"./index.php?sport=" . $sportType . "\">" . $sportType ."</a>/ Full program");
-				} 
-				elseif( $program == "slv" ) {
-					printf( "<a href=\"./index.php?sport=" . $sportType . "\">" . $sportType ."</a>/ Reduced program (SLV)");
-				}
-				
-				printf( "</td></tr></table>" );
-			}*/
 			
 			
 			/*
@@ -246,67 +228,70 @@ require_once 'Layout.php';
 			 * Building links with event type per event status
 			 */
 			printf( "<table><tr id=\"programMenu\">" );
-			
-			foreach( $eventTypeArr as $sport ) {
-				
-				// get the key which is associated with the value
-				$arrayKey = array_keys( $eventTypeArr, $sport );
-				// we check if there are events which can be associated with the status
-				$isEmpty = $feed->getEventWStatus( $program, $arrayKey[0], $_GET['eventsts'] );
-				 
-				if( !empty($isEmpty) ) {
-					// let's build the link with the text to display it
-					$link = "";
-					if( isset($program) ) {
-						
-						$link .= "prog=". $program;
-						$link .= "&";
-					}
-					if( isset($_GET['eventsts']) ) {
-						
-						$link .= "eventsts=". $_GET['eventsts'];
-						$link .= "&";
-					}
+			if( isset($program) && isset($_GET['eventsts']) ) {
+				foreach( $eventTypeArr as $sport ) {
 					
-					$link .= "eventType=". $sport;
-					printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
-				} 
+					// get the key which is associated with the value
+					$arrayKey = array_keys( $eventTypeArr, $sport );
+					// we check if there are events which can be associated with the status
+					$eventsWithStatus= $feed->getEventWStatus( $program, $arrayKey[0], $_GET['eventsts'] );
+					$kompaktEvents = $feed->getKompaktEvents( $program, $arrayKey[0] ); 
+					
+					if( !empty($eventsWithStatus) ) {
+						// let's build the link with the text to display it
+						$link = "";
+						if( isset($program) ) {
+							
+							$link .= "prog=". $program;
+							$link .= "&";
+						}
+						if( isset($_GET['eventsts']) ) {
+							
+							$link .= "eventsts=". $_GET['eventsts'];
+							$link .= "&";
+						}
+						
+						$link .= "eventType=". $sport;
+						printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
+					}
+					else if( !empty($kompaktEvents) ) {
+						// let's build the link with the text to display it
+						$link = "";
+						if( isset($program) ) {
+							
+							$link .= "prog=". $program;
+							$link .= "&";
+						}
+						if( isset($_GET['eventsts']) ) {
+							
+							$link .= "eventsts=". $_GET['eventsts'];
+							$link .= "&";
+						}
+						
+						$link .= "eventType=". $sport;
+						printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
+					}
+	
+				}
 			}
 			printf( "</tr></table>" );
 			
+			// section for rendering the count per league table
 			if( isset($eventType) ) {
 				
 				// get the key which is associated with the value
 				$arrayKey = array_keys( $eventTypeArr, $eventType );
 				
-				printf("<table><!--<colgroup>
-				<col span=\"1\" class=\"darkBG\" />
-				<col span=\"1\" class=\"lightBG\" />
-				<col span=\"1\" class=\"darkBG\" />
-				<col span=\"1\" class=\"lightBG\" />
-				<col span=\"1\" class=\"darkBG\" />
-				<col span=\"1\" class=\"lightBG\" />
-				<col span=\"1\" class=\"darkBG\" />
-				<col span=\"1\" class=\"lightBG\" />
-				</colgroup>
-				<th>League</th>
-				<th>Count</th>
-				<th>League</th>
-				<th>Count</th>
-				<th>League</th>
-				<th>Count</th>
-				<th>League</th>
-				<th>Count</th>-->");
+				printf("<table>");
 				
 				$arrayCount = count( $feed->getLeagues($program, $arrayKey[0]) );
-				// we need to replace the eventType=American Football with the current event type
-				// ugly workaround, since there might be situations where the string eventType=American Football might not be found
-				//$link = str_replace( "eventType=American Football", "eventType=". $eventType, $link );
 				
 				$link = "prog=" .$program. "&eventsts=" .$_GET['eventsts']. "&eventType=" .$_GET['eventType']. "&league=";
 				$tableLayout = new Layout();
 				$tableLayout->createColumnStyle( $arrayCount ); 
 				
+				// we only want a pair of four columns to be rendered, so we need to do some magic to display the columns
+				// with no more than four column pairs 
 				if( $arrayCount <= 4 ) {
 
 					printf("<tr>");
@@ -348,7 +333,8 @@ require_once 'Layout.php';
 			/*
  			 * ------------------------------------------------------------------------------------------------------------------------------------------------ 
  			 */
-
+			// section for rendering the event overview details. This section makes it possible to jump to the overall details of an event including 
+			// the markets
 			if( isset($eventLeague) ) {
 					
 				printf("<table>
@@ -358,14 +344,13 @@ require_once 'Layout.php';
 							</colgroup>");
 				printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
 				$arrayKey = array_keys( $eventTypeArr, $eventType );
+				
 				foreach( $feed->getEventsPerLeague($program, $arrayKey[0], $eventStatus, $eventLeague) as $leagueEvent) {
 					
 					printf( "<tr><td class=\"marketBox\">Event: </td><td class=\"eventHeader\"><a href=\"./index.php?evtdetails=true&eventid=". $leagueEvent->{'ID'} ."\">".$leagueEvent->{'Descr'} ."</a></td></tr>" );
+					printf( "<tr><td class=\"marketBox\">Event ID: </td><td class=\"marketBox\">". $leagueEvent->{'ID'}."</a></td></tr>" );
 					printf( "<tr><td class=\"marketBox\">Event status: </td><td class=\"marketBox\">". $leagueEvent->{'EventStatus'} ."</td></tr>" );
-					printf( "<tr><td class=\"marketBox\">Country: </td><td class=\"marketBox\">". $leagueEvent->{'Country'} ."</td></tr>" );
 					printf( "<tr><td class=\"marketBox\">League: </td><td class=\"marketBox\">". $leagueEvent->{'LeagueFullDescr'} ." / ". $leagueEvent->{'League'} ."</td></tr>" );
-					printf( "<tr><td class=\"marketBox\">Country: </td><td class=\"marketBox\">". $leagueEvent->{'Country'} ."</td></tr>" );
-					printf( "<tr><td class=\"marketBox\">Bet start date: </td><td class=\"marketBox\">". $leagueEvent->{'StartDate'} ."</td></tr>" );
 					printf( "<tr><td class=\"marketBox\">Kick off date: </td><td class=\"marketBox\">". $leagueEvent->{'Date'} ."</td></tr>" );
 					printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
 				}
@@ -375,18 +360,19 @@ require_once 'Layout.php';
 			/*
 			 * -----------------------------------------------------------------------------------------------------------------------------------------------
 			 */
+			 // display the overall details of one specific event which was clicked in the section before
 			 if( isset($_GET['evtdetails']) && isset($_GET['eventid']) ) {
 			 	if( strtolower($_GET['evtdetails']) == "true" ) {
 			 		
 					$eventDetails = $feed->getEventDetails( $program, $_GET['eventid']);
 					
 					if( !empty($eventDetails) ) {
+						// display the event details
 				 		printf( "<table><colgroup>
 								<col span='1' class='darkBG' />
 								<col span='1' class='lightBG' />
 								</colgroup>" );
 						printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
-				 		
 						printf( "<tr><td class=\"marketBox\">Event Id: </td><td class=\"marketBox\">". $eventDetails->{'ID'} ."</td></tr>" );	
 						printf( "<tr><td class=\"marketBox\">Event: </td><td class=\"marketBox\">". $eventDetails->{'Descr'} ."</td></tr>" );
 						printf( "<tr><td class=\"marketBox\">Event type: </td><td class=\"marketBox\">". $eventTypeArr[$eventDetails->{'EventType'}] ."&nbsp(". $eventDetails->{'EventType'} .")</td></tr>" );
@@ -416,15 +402,14 @@ require_once 'Layout.php';
 						printf("<th>Market</th>");
 						printf("<th>Descr:</th>");
 						printf("<th>Odd</th>");
+						// render markets
 						foreach( (array) $feed->getEventDetails( $program, $_GET['eventid'])->{'outcomes'} as $market ) {
 							printf("<tr><td class=\"marketBox\">". $market->{'ID'} ."</td><td class=\"marketBox\">"
 							. $market->{'Market'} ."</td><td class=\"marketBox\">". $market->{'Descr'} ."</td>
 							<td class=\"marketBox\">". $market->{'Odd'} ."</td><td>" ); 
 						}
-						
 						printf( "</table></td></tr>");
-						//printf( "<tr><td>&nbsp</td><td>&nbsp</td></tr>" );
-							
+						
 						printf( "</table>" );
 					}
 					else {
