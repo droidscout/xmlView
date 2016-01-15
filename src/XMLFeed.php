@@ -9,9 +9,12 @@ class XMLFeed {
 	var $activeEvents = array();
 	var $inactiveEvents = array();
 	var $blockedEvents = array();
+	var $cancelledEvents = array();
+	var $payoutEvents = array();
 	var $notInactiveEvents = array();
 	var $totalEventsPerGame = array();
 	var $eventsWEventStatus = array();
+	var $startedEvents = array();
 	/*
 	 * class constructor
 	 * @array: JSON object for further process
@@ -117,7 +120,7 @@ class XMLFeed {
 	 */
 	public function getKompaktEventsCount( $program, $eventType ) {
 		
-		if( count($this->kompaktEvents) == 0) {
+		if( count($this->kompaktEvents) == 0 ) {
 			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
 				if( $eventArray->{'PlayIndex'} != "0" && strtolower($eventArray->{'EventType'}) == strtolower($eventType) ) {
 					$this->kompaktEvents[$i++] = $eventArray;
@@ -128,6 +131,48 @@ class XMLFeed {
 		return count( $this->kompaktEvents );
 	}
 	
+	public function getCancelledEventsCount( $program, $eventType ) {
+		
+		if( count($this->cancelledEvents) == 0 ) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				if( strtolower($eventArray->{'EventStatus'}) == "cancelled" ) {
+					$this->cancelledEvents[$i++] = $eventArray;
+				}
+			}
+		}
+		
+		return count( $this->cancelledEvents );
+		
+	}
+	
+	public function getPayoutEventsCount( $program, $eventType ) {
+		
+		if( count($this->payoutEvents) == 0 ) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				if( strtolower($eventArray->{'EventStatus'}) == "payable" ) {
+					$this->payoutEvents[$i++] = $eventArray;
+				}
+			}
+		}
+		
+		return count( $this->payoutEvents );
+		
+	}
+	
+	public function getStartedEventsCount( $program, $eventType ) {
+		
+		if( count($this->startedEvents) == 0 ) {
+			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
+				if( strtolower($eventArray->{'EventStatus'}) == "started" ) {
+					$this->startedEvents[$i++] = $eventArray;
+				}
+			}
+		}
+		
+		return count( $this->startedEvents );
+		
+	}
+	
 	/*
 	 * returns the number of compact events associated with a certain program
 	 * @program: the program as String
@@ -135,7 +180,7 @@ class XMLFeed {
 	 */
 	public function getKompaktEvents( $program, $eventType ) {
 		$retVal = array();
-		if( count($this->kompaktEvents) == 0) {
+		if( count($this->kompaktEvents) == 0 ) {
 			foreach( $this->getEvents($program, $eventType) as $eventArray ) {
 				if( $eventArray->{'PlayIndex'} != "0" && $eventArray->{'EventType'} == $eventType ) {
 					$retVal[$i++] = $eventArray;
@@ -153,9 +198,12 @@ class XMLFeed {
 	 */
 	public function getAllEventPerGameCount( $program, $eventType ) {
 		
-		return $this->getActiveEventsCount($program, $eventType) + 
-				$this->getInactiveEventsCount($program, $eventType) + 
-					$this->getBlockedEventsCount($program, $eventType);
+		return $this->getActiveEventsCount( $program, $eventType ) + 
+				$this->getInactiveEventsCount( $program, $eventType ) + 
+					$this->getBlockedEventsCount( $program, $eventType ) +
+						$this->getCancelledEventsCount( $program, $eventType ) + 
+							$this->getPayoutEventsCount( $program, $eventType ) + 
+								$this->getStartedEventsCount( $program, $eventType );
 		
 	}
 	
@@ -174,6 +222,7 @@ class XMLFeed {
 		return count( $this->notInactiveEvents );
 		
 	}
+	
 
 	public function getEventWStatus( $program, $eventType, $eventStatus ) {
 		$retVal = array();
@@ -237,5 +286,8 @@ class XMLFeed {
 		$this->inactiveEvents = null;
 		$this->blockedEvents = null;
 		$this->kompaktEvents = null;
+		$this->cancelledEvents = null;
+		$this->payoutEvents = null;
+		$this->startedEvents = null;
 	}
 }

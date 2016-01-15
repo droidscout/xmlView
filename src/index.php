@@ -27,6 +27,15 @@ require_once 'Layout.php';
 			case "kompakt":
 				$eventStatus = "Kompakt";
 				break;
+			case "started":
+				$eventStatus = "Started";
+				break;
+			case "cancelled":
+				$eventStatus = "Cancelled";
+				break;
+			case "payable":
+				$eventStatus = "Payable";
+				break;
 		}
 	}
 	
@@ -118,18 +127,27 @@ require_once 'Layout.php';
 				<col span="1" class="lightBG" />
 				<col span="1" class="darkBG" />
 				<col span="1" class="lightBG" />
+				<col span="1" class="darkBG" />
+				<col span="1" class="lightBG" />
+				<col span="1" class="darkBG" />
 			</colgroup>
 			<th>Sport type</th>
 			<th>All events</th>
 			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=inactive');?>">Inactive events</a></th>
 			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=active');?>">Active events</a></th>
 			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=blocked');?>">Blocked events</a></th>
+			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=started');?>">Started events</a></th>
+			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=cancelled');?>">Cancelled events</a></th>
+			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=payable');?>">Payable events</a></th>
 			<th class="menuBox"><a href="<?php printf('./index.php?prog='. $program .'&eventsts=kompakt');?>">Kompakt events</a></th>
 			<?php
 				$totalActiveEvents = 0;
 				$totalInactiveEvents = 0;
 				$totalBlockedEvents = 0;
 				$totalKomapktEvents = 0;
+				$totalCancelledEvents = 0;
+				$totalPayoutEvents = 0;
+				$totalStartedEvents = 0;
 				
 				foreach( $eventTypeArr as $sport ) {
 					$feed = new XMLFeed( $jsonData );
@@ -144,6 +162,9 @@ require_once 'Layout.php';
 					$totalInactiveEvents += $feed->getInactiveEventsCount( $program, $arrayKey[0] );
 					$totalBlockedEvents += $feed->getBlockedEventsCount( $program, $arrayKey[0] );
 					$totalKompaktEvents += $feed->getKompaktEventsCount( $program, $arrayKey[0] );
+					$totalCancelledEvents += $feed->getCancelledEventsCount( $program, $arrayKey[0] );
+					$totalPayoutEvents += $feed->getPayoutEventsCount( $program, $arrayKey[0] );
+					$totalStartedEvents += $feed->getStartedEventsCount( $program, $arrayKey[0] );
 					/*
 					 * display numbers per event type
 					 */
@@ -153,6 +174,9 @@ require_once 'Layout.php';
 					printf( "<td class=\"tableValues\">%s</td>", $feed->getInactiveEventsCount( $program, $arrayKey[0]) );
 					printf( "<td class=\"tableValues\">%s</td>", $feed->getActiveEventsCount( $program, $arrayKey[0]) );
 					printf( "<td class=\"tableValues\">%s</td>", $feed->getBlockedEventsCount( $program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getStartedEventsCount( $program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getCancelledEventsCount( $program, $arrayKey[0]) );
+					printf( "<td class=\"tableValues\">%s</td>", $feed->getPayoutEventsCount( $program, $arrayKey[0]) );
 					printf( "<td class=\"tableValues\">%s</td>", $feed->getKompaktEventsCount( $program, $arrayKey[0] ) );
 					printf("</tr>");
 				}
@@ -161,10 +185,14 @@ require_once 'Layout.php';
 				 */
 				printf( "<tr>" );
 				printf( "<td class=\"marketBox\">Total</td>" );
-				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents + $totalActiveEvents + $totalBlockedEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents + $totalActiveEvents + $totalBlockedEvents + 
+																							$totalCancelledEvents + $totalPayoutEvents + $totalStartedEvents );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalInactiveEvents );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalActiveEvents );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalBlockedEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalStartedEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalCancelledEvents );
+				printf( "<td class=\"totalTableValues\">%s</td>", $totalPayoutEvents );
 				printf( "<td class=\"totalTableValues\">%s</td>", $totalKompaktEvents );
 				printf("</tr>");
 				
@@ -251,8 +279,10 @@ require_once 'Layout.php';
 							$link .= "&";
 						}
 						
-						$link .= "eventType=". $sport;
-						printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
+						if( count($eventsWithStatus) > 0 ) {
+							$link .= "eventType=". $sport;
+							printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
+						}
 					}
 					else if( !empty($kompaktEvents) ) {
 						// let's build the link with the text to display it
@@ -268,8 +298,10 @@ require_once 'Layout.php';
 							$link .= "&";
 						}
 						
-						$link .= "eventType=". $sport;
-						printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
+						if( count($eventsWithStatus) > 0 ) {
+							$link .= "eventType=". $sport;
+							printf("<td class=\"menuBox\"><a href=\"./index.php?" .$link. "\">". $sport ."</a></td>");
+						}
 					}
 	
 				}
